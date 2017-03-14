@@ -1,0 +1,15 @@
+{
+  "name": "qtmjs",
+  "version": "1.0.0",
+  "description": "quantum turing machine simulator package",
+  "main": "driver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sdiemert",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^1.2.0",
+    "mathjs": "^3.10.0"
+  }
+}
