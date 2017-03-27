@@ -57,18 +57,30 @@ function buildMachine(M, Nt, base){
         U = math.add(U, makeTransferMatrix(S[i][0], S[i][1], S[i][2], S[i][4], S[i][3], Nt, Ns, S[i][5], Nx));
     }
 
-    console.log("Built new machine, matrix is size: ", U.size());
+    var Q = new QTM(U, Ns, 0, Nt, getLastState(S));
 
-    return new QTM(U, Ns,0, Nt);
+    console.log("New machine: " + Q.toString());
+
+    return Q;
+
+}
+
+
+function getLastState(S){
+
+    let maxVal = S[0][0];
+
+    for(let i = 0; i < S.length; i++){
+        if(S[i][0] > maxVal) maxVal = S[i][0];
+    }
+
+    return maxVal;
 
 }
 
 function machineFromFile(fname, Nt, base){
     // read file and remove duplicate new line characters.
     const blob = fs.readFileSync(fname, "utf-8").replace(/\n\n/g, "\n");
-
-    console.log(blob);
-
     return buildMachine(csv(blob), Nt, base);
 }
 
@@ -90,17 +102,24 @@ function makeTransferMatrix(q1, r, w, m, q2, I, Q, a, x){
 
     let U = math.zeros(x,x, 'sparse');
 
-    let i,k,z, b0, b1, cx, c0, rx, r1;
+    let i,k,z, b0, b1, cx, c0, rx, r1, ip3, Ip3;
+
     for(i = 0; i < I; i++){
-        b0 = math.pow(3, I)*Q*i + q1 * math.pow(3,I); // base of starting state
-        b1 = math.pow(3, I)*Q*(i+m) + q2 * math.pow(3,I); // base of terminating state
+
+        // cache some frequently computed values...
+        ip3 = math.pow(3,i);
+        Ip3 = math.pow(3,I);
+
+        b0 = Ip3*Q*i + q1 * Ip3; // base of starting state
+        b1 = Ip3*Q*(i+m) + q2 * Ip3; // base of terminating state
+
 
         for(z=0; z < math.pow(3, I-i-1); z++){
 
-            for(k = 0; k < math.pow(3,i); k++){
-                cx = k + 3 * math.pow(3, i) * z + r * math.pow(3, i);
+            for(k = 0; k < ip3; k++){
+                cx = k + 3 * ip3* z + r * ip3;
                 c0 = b0 + cx;
-                rx = k + 3 * math.pow(3, i) * z + w * math.pow(3, i);
+                rx = k + 3 * ip3 * z + w * ip3;
                 r1 = b1 + rx;
 
                 if(r1 >= x){

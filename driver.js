@@ -21,23 +21,21 @@ for(let i = 0; i < T.length; i++){
 /** @type QTM {qtm.QTM} */
 const QTM = Builder.machineFromFile("./specs/qtm-2-parity.csv", T.length, 3);
 
-/*
-const Nt = T.length;
-const Ns = 2; // TODO: make this count states on input
-const Nx = math.pow(3, Nt) * Ns * Nt;
 
-// Setup the initial state matrix
-let V = math.zeros(Nx, 1);
-let j = indexFromState(0,0, T, Ns);
-V = math.subset(V, math.index(j,0), 1);
+let counts = {};
+/** @type {Configuration} */
+let c = null;
+for(let i = 0; i < 10; i++){
+    c  = QTM.execute(T, 0, 5);
 
-console.log(V.toString());
-V = math.multiply(QTM.U, V);
-console.log(V.toString());
+    if(!counts[c.configurationId]) counts[c.configurationId] = {configuration : c, count : 1};
+    else counts[c.configurationId].count += 1;
 
-*/
+    console.log(c.toString());
 
-QTM.execute(T, 0, 5);
+}
+
+console.log(counts);
 
 
 
