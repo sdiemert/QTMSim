@@ -57,11 +57,11 @@ function buildMachine(M, Nt, base){
         U = math.sparse(math.add(U, makeTransferMatrix(S[i][0], S[i][1], S[i][2], S[i][4], S[i][3], Nt, Ns, S[i][5], Nx)));
     }
 
-    console.log("Unitary?", checkUnitary(U, Ns, Nt));
+    //console.log("Unitary?", checkUnitary(U, Ns, Nt));
 
     var Q = new QTM(math.matrix(U, 'sparse'), Ns, 0, Nt, getLastState(S));
 
-    console.log("New machine: " + Q.toString());
+    //console.log("New machine: " + Q.toString());
 
     return Q;
 
@@ -106,7 +106,7 @@ function machineFromFile(fname, Nt, base){
 
     }else if(csvRegex.exec(fname)){
         // read file and remove duplicate new line characters.
-        const blob = fs.readFileSync(fname, "utf-8").replace(/\n\n/g, "\n").replace(/\n;.*\n/g, "\n");
+        const blob = fs.readFileSync(fname, "utf-8").replace(/;.*\n/g, "").replace(/\n\n/g, "\n");
         const M =  buildMachine(csv(blob), Nt, base);
 
         //write machine to file for speed later.
@@ -135,7 +135,7 @@ function machineFromFile(fname, Nt, base){
  */
 function makeTransferMatrix(q1, r, w, m, q2, I, Q, a, x){
 
-    console.log(q1, r, w, m, q2, I ,Q, a, x);
+    //console.log(q1, r, w, m, q2, I ,Q, a, x);
 
     let U = math.zeros(x,x, 'sparse');
 
@@ -162,7 +162,7 @@ function makeTransferMatrix(q1, r, w, m, q2, I, Q, a, x){
                 //console.log(r1, c0, a);
 
                 if(r1 >= x || r1 < 0){
-                    console.log("overflow", r1, c0, a);
+                    //console.log("overflow", r1, c0, a);
                     U = math.subset(U, math.index(c0, c0), 0);
                 }else{
                     U = math.subset(U, math.index(r1, c0), a);

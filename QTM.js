@@ -128,7 +128,7 @@ class QTM{
      * @returns {Configuration[]}
      * @private
      */
-    _getSuperposition(){
+    getSuperposition(){
 
         const L = this.tapeLength * this.numStates * math.pow(3, this.tapeLength);
 
@@ -149,18 +149,17 @@ class QTM{
     }
 
     /**
-     * Executes the QTM.
+     * Executes the QTM. The machine will halt if: 1) the number of steps taken exceeds in provided bound, or
+     *  2) the machine ends up in a superposition of the halting state.
      *
      * @param T {Array} an array of integers (0,1,2) to represent the tape, must be same size as machine.
      * @param i {number} the index to start the head of the machine at on the tape, defaults to zero.
      * @param n {number} an upper bound on the number of steps to allow the machine to take.
-     * @param fn {function=} call this function after each machine step.
+     * @param fn {function=} call this function after each machine step, passes machine reference.
      *
-     * @return {Configuration}
+     * @return nothing, finishes when the machine has halted (after n steps or when halting state is reached).
      */
     execute(T, i, n, fn) {
-
-        console.log("-----------------------");
 
         if (i === null || i === undefined) i = 0;
 
@@ -168,26 +167,26 @@ class QTM{
 
         this.V = math.zeros(this.U.size()[0], 1);
         let j = this.indexFromState(0, T);
-
         this.V = math.subset(this.V, math.index(j,0), 1);
 
-        console.log(this._getSuperposition().toString());
-
-        for (let i = 0; i < n; i++) {
-
+        for (let i = 0; i < n && !this.haltingSuperposition(); i++) {
             this.V = math.multiply(this.U, this.V);
-
-            console.log(this._getSuperposition().toString());
-
-            if(fn) fn();
+            if(fn) fn(this);
         }
 
-        console.log("---------------------------");
+    }
 
-        const m  = this.measure();
-
-        return m;
-
+    /**
+     * Determines if the machine is in a superposition of halting states.
+     *
+     *  @return {boolean}
+     */
+    haltingSuperposition(){
+        const S = this.getSuperposition();
+        for(let s = 0; s < S.length; s++){
+            if(S[s].machineState !== this.halt) return false;
+        }
+        return true;
     }
 
 
@@ -200,9 +199,7 @@ class QTM{
                 v = math.subset(this.V, math.index(k, 0));
                 console.log(u, v);
             }
-
         }
-
     }
 
     /**
@@ -214,7 +211,7 @@ class QTM{
      */
     measure(){
 
-        let S = this._getSuperposition();
+        let S = this.getSuperposition();
 
         const r = Math.random(); // random between 0 and 1.
         let s = 0;
