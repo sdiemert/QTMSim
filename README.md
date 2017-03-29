@@ -10,4 +10,4 @@ Deutsch's problem is a toy problem for demonstrating how a quantum machine can p
 
 Four QTM specifications are provided in `specs` folder, one for each possible configuration in Deutsch's problem.
 
-Run them by `$ node qtmjs.js -m ./specs/qtm-x.csv` -t 01# -i 10`
+Run them by `$ node qtmjs.js -m ./specs/qtm-x.csv -t 01# -i 10`
