@@ -6,7 +6,7 @@ This simulator takes as input a machine specification and a tape and executes a 
 
 ## Examples
 
-Deutsch's problem is a toy problem for demonstrating how a quantum machine can provide exponential speed up (when compared with a classical machine). The problem is a simplification of the Deutsch-Jozsa problem. You can read more about it here: [https://en.wikipedia.org/wiki/Deutsch%E2%80%93Jozsa_algorithm][]https://en.wikipedia.org/wiki/Deutsch%E2%80%93Jozsa_algorithm
+Deutsch's problem is a toy problem for demonstrating how a quantum machine can provide exponential speed up (when compared with a classical machine). The problem is a simplification of the Deutsch-Jozsa problem. You can read more about it here [https://en.wikipedia.org/wiki/Deutsch%E2%80%93Jozsa_algorithm](https://en.wikipedia.org/wiki/Deutsch%E2%80%93Jozsa_algorithm).
 
 Four QTM specifications are provided in `specs` folder, one for each possible configuration in Deutsch's problem.
 
