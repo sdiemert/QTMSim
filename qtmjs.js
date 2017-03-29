@@ -64,7 +64,7 @@ function runCommadLineSimluation () {
 
     let T;
     if (x && !y) T = csv(fs.readFileSync(tapeInput, "utf-8"))[0];
-    else T = tapeInput;
+    else T = tapeInput.replace(/#/g, "2");
 
     for (let i = 0; i < T.length; i++) {
         T[i] = parseInt(T[i]);
