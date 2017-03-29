@@ -19,23 +19,17 @@ for(let i = 0; i < T.length; i++){
 }
 
 /** @type QTM {qtm.QTM} */
-const QTM = Builder.machineFromFile("./specs/qtm-2-parity.csv", T.length, 3);
+let QTM = Builder.machineFromFile("./specs/qtm-8.csv", T.length, 3);
 
 
 let counts = {};
 /** @type {Configuration} */
 let c = null;
-for(let i = 0; i < 10; i++){
-    c  = QTM.execute(T, 0, 5);
 
-    if(!counts[c.configurationId]) counts[c.configurationId] = {configuration : c, count : 1};
-    else counts[c.configurationId].count += 1;
+c  = QTM.execute(T, 0, 5);
 
-    console.log(c.toString());
-
-}
-
-console.log(counts);
+console.log(c.toString());
+console.log(QTM._getSuperposition().toString());
 
 
 

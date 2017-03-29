@@ -34,8 +34,17 @@ class Configuration{
 
     }
 
+    /**
+     *
+     * @param z {Complex}
+     * @param p {number} fixed point precision
+     */
+    complexToString(z, p){
+        return z.re.toFixed(p) + (z.im !==0 ? ("i" + z.im.toFixed(p)) : "");
+    }
+
     toString(){
-        let S = "{ id: "+this.configurationId+", state: " + this.machineState + ", coeff : "+this.coefficent+", amp^2: "+this.amplitudeSquared+" tape: ";
+        let S = "{ id: "+this.configurationId+", state: " + this.machineState + ", coeff : "+this.complexToString(this.coefficent, 2)+", amp^2: "+this.amplitudeSquared.toFixed(2)+" tape: ";
 
         for(let i = 0; i < this.tape.length; i++){
             if(i === this.headPosition){
@@ -97,11 +106,12 @@ class QTM{
     stateFromIndex(i){
 
         const index = i;
+        const pow3t = Math.pow(3, this.tapeLength);
 
-        const head = Math.floor(i / (this.numStates * Math.pow(3, this.tapeLength)));
-        const state = Math.floor((i - (head * this.numStates * Math.pow(3,this.tapeLength))) / Math.pow(3, this.tapeLength));
+        const head = Math.floor(i / (this.numStates * pow3t));
+        const state = Math.floor((i - (head * this.numStates * pow3t)) / pow3t);
 
-        i = Math.floor(i - head * state * Math.pow(3, this.tapeLength));
+        i = Math.floor(i - head * state * pow3t);
 
         let tape = [];
 
@@ -115,25 +125,25 @@ class QTM{
     }
 
     /**
-     *
-     * @param V
      * @returns {Configuration[]}
      * @private
      */
-    _getSuperposition(V){
+    _getSuperposition(){
 
         const L = this.tapeLength * this.numStates * math.pow(3, this.tapeLength);
 
         let v = null, r = null, R = [];
 
         for(let i = 0; i < L; i++){
-            v = math.subset(V, math.index(i,0));
+            v = math.subset(this.V, math.index(i,0));
             if(v != 0){
                 r            = this.stateFromIndex(i);
-                r.setCoefficent(v);
+                r.setCoefficent(math.complex(v));
                 R.push(r);
             }
         }
+
+        if(R.length === 0) R.push("empty");
 
         return R
     }
@@ -150,6 +160,8 @@ class QTM{
      */
     execute(T, i, n, fn) {
 
+        console.log("-----------------------");
+
         if (i === null || i === undefined) i = 0;
 
         // TODO : Check tape length is OK.
@@ -159,17 +171,39 @@ class QTM{
 
         this.V = math.subset(this.V, math.index(j,0), 1);
 
+        console.log(this._getSuperposition().toString());
+
         for (let i = 0; i < n; i++) {
 
             this.V = math.multiply(this.U, this.V);
 
+            console.log(this._getSuperposition().toString());
+
             if(fn) fn();
         }
 
-        return this.measure();
+        console.log("---------------------------");
+
+        const m  = this.measure();
+
+        return m;
 
     }
 
+
+    _checkRow(i){
+        let u, v;
+        for(let k = 0; k < this.U.size()[0]; k++){
+
+            u = math.subset(this.U, math.index(i,k));
+            if(u != 0){
+                v = math.subset(this.V, math.index(k, 0));
+                console.log(u, v);
+            }
+
+        }
+
+    }
 
     /**
      * Measures the current state of the QTM - does this using "real" quantum
@@ -180,7 +214,7 @@ class QTM{
      */
     measure(){
 
-        let S = this._getSuperposition(this.V);
+        let S = this._getSuperposition();
 
         const r = Math.random(); // random between 0 and 1.
         let s = 0;

@@ -49,15 +49,17 @@ function buildMachine(M, Nt, base){
     const Ns = countStates(S);
     const Nx = math.pow(base, Nt) * Ns * Nt;
 
-    console.log("Building machine, tape size:", Nt, "Size: ", Nx);
+    console.log("Building machine, state size:", Ns, "tape size:", Nt, "Size: ", Nx);
 
     let U = math.zeros(Nx, Nx);
 
     for(let i = 0; i < S.length; i++){
-        U = math.add(U, makeTransferMatrix(S[i][0], S[i][1], S[i][2], S[i][4], S[i][3], Nt, Ns, S[i][5], Nx));
+        U = math.sparse(math.add(U, makeTransferMatrix(S[i][0], S[i][1], S[i][2], S[i][4], S[i][3], Nt, Ns, S[i][5], Nx)));
     }
 
-    var Q = new QTM(U, Ns, 0, Nt, getLastState(S));
+    console.log("Unitary?", checkUnitary(U, Ns, Nt));
+
+    var Q = new QTM(math.matrix(U, 'sparse'), Ns, 0, Nt, getLastState(S));
 
     console.log("New machine: " + Q.toString());
 
@@ -78,10 +80,45 @@ function getLastState(S){
 
 }
 
+/**
+ *
+ * @param fname {string}
+ */
+function machineFromMatrixFile(fname){
+
+    /** @type {QTM} */
+    const M = JSON.parse(fs.readFileSync(fname, 'utf-8'));
+
+    const U =  math.matrix(math.complex(M.U.data), 'sparse');
+
+    return new QTM(U, M.numStates, M.start, M.tapeLength, M.halt);
+
+}
+
 function machineFromFile(fname, Nt, base){
-    // read file and remove duplicate new line characters.
-    const blob = fs.readFileSync(fname, "utf-8").replace(/\n\n/g, "\n");
-    return buildMachine(csv(blob), Nt, base);
+
+    let matrixRegex = /\.matrix/;
+    let csvRegex = /\.csv/;
+
+    if(matrixRegex.exec(fname)){
+
+        return machineFromMatrixFile(fname);
+
+    }else if(csvRegex.exec(fname)){
+        // read file and remove duplicate new line characters.
+        const blob = fs.readFileSync(fname, "utf-8").replace(/\n\n/g, "\n").replace(/\n;.*\n/g, "\n");
+        const M =  buildMachine(csv(blob), Nt, base);
+
+        //write machine to file for speed later.
+        fs.writeFileSync(fname.replace(/\.csv/g, ".matrix"), JSON.stringify(M), 'utf-8');
+
+        return M;
+
+    }else{
+        return null; // nothing found.
+    }
+
+
 }
 
 /**
@@ -122,8 +159,11 @@ function makeTransferMatrix(q1, r, w, m, q2, I, Q, a, x){
                 rx = k + 3 * ip3 * z + w * ip3;
                 r1 = b1 + rx;
 
-                if(r1 >= x){
-                    U = math.subset(U, math.index(c0, c0), a);
+                //console.log(r1, c0, a);
+
+                if(r1 >= x || r1 < 0){
+                    console.log("overflow", r1, c0, a);
+                    U = math.subset(U, math.index(c0, c0), 0);
                 }else{
                     U = math.subset(U, math.index(r1, c0), a);
                 }
@@ -131,7 +171,88 @@ function makeTransferMatrix(q1, r, w, m, q2, I, Q, a, x){
         }
     }
 
+
     return U;
+}
+
+
+/**
+ *
+ * @param U {Matrix}
+ * @param t {number}
+ * @param q {number}
+ */
+function checkUnitary(U, q, t){
+
+    console.log("checking unitary...");
+   const Up = math.matrix(math.transpose(math.conj(U)), 'sparse');
+
+   console.log("found conj transpose");
+
+   const X = math.multiply(Up, U);
+
+   console.log("found result"); /*
+
+     /*
+    We can only consider the first t-1 cells of the tape,
+    the last cell will have invalid movements due to the machine
+    actually needing an infinite tape....
+    */
+
+    var S = "", Su = "";
+
+    for(var i = 0; i < X.size()[0]; i++){
+
+        for(var j = 0; j < X.size()[0]; j++){
+
+            S += math.subset(X, math.index(i,j)) +" ";
+            Su += math.subset(U, math.index(i,j)) +" ";
+
+        }
+        S += "\n";
+        Su += "\n";
+    }
+
+    //console.log(S);
+    //console.log(Su);
+
+    fs.writeFileSync('matrix.txt', Su, 'utf-8');
+
+   const R = math.range(0, math.pow(3, t-1) * (t-1) * q);
+
+   const Xs = math.subset(X, math.index(R, R));
+
+   return math.deepEqual(Xs, math.eye(R.size()[0]));
+}
+
+/**
+ *
+ * @param U {math.Matrix}
+ *
+ * @return {boolean}
+ */
+function checkMatrixAmplitudes(U){
+
+    const s = U.size()[0];
+
+    let rowSum, v;
+
+    for(let i = 0; i < s; i++){
+        rowSum = 0;
+        for(let j = 0; j < s; j++){
+
+            v = math.complex(math.subset(U, math.index(i,j)));
+
+            rowSum += math.pow(v.re, 2) + math.pow(v.im, 2);
+
+        }
+
+        if(rowSum > 1) return false;
+
+    }
+
+    return true;
+
 }
 
 
