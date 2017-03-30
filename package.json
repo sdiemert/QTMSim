@@ -14,5 +14,25 @@
     "csv-parse": "^1.2.0",
     "libui-node": "0.0.12",
     "mathjs": "^3.10.0"
-  }
+  },
+  "directories": {
+    "example": "examples"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sdiemert/QTMSim.git"
+  },
+  "keywords": [
+    "quantum-turing-machine",
+    "quantum-computing",
+    "quantum-algorithms",
+    "turing-machine-simulator",
+    "turing-machine",
+    "quantum-turing-machine-simulator"
+  ],
+  "bugs": {
+    "url": "https://github.com/sdiemert/QTMSim/issues"
+  },
+  "homepage": "https://github.com/sdiemert/QTMSim#readme"
 }

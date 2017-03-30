@@ -4,6 +4,15 @@ This is a simulator package for a Quantum Turing Machine (QTM). This was complet
 
 This simulator takes as input a machine specification and a tape and executes up to a specified number of steps of the machine.
 
+**Table of Contents:**
+
+* [Machine Specification](#machine-specification)
+* [Examples](#examples)
+    + [Simple Example](#overwriter)
+    + [Bit Parity Example](#bit-parity)
+    + [Deutsch's Problem](#deutsch's-problem)
+* [JavaScript API](#api)
+
 ## Machine Specification
 
 Recall that Turing Machine has a state transition function that maps an internal machine state and read tape symbol to write tape symbol, a next state, and a movement direction. QTMs use a similar formulation, however they also have a complex number that acts as a coefficient of the transition. Thus a tuple in the transition function could be represented as `(q,r,w,q',m,a)`, there is the added restriction that `sum(|a_i|^2) = 1.0` for all `a_i` that have the same `q,r` pairings.
