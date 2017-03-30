@@ -10,7 +10,7 @@ This simulator takes as input a machine specification and a tape and executes up
 * [Examples](#examples)
     + [Simple Example](#overwriter)
     + [Bit Parity Example](#bit-parity)
-    + [Deutsch's Problem](#deutsch's-problem)
+    + [Deutsch's Problem](#deutschs-problem)
 * [JavaScript API](#api)
 
 ## Machine Specification
