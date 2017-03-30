@@ -23,6 +23,13 @@ Tapes may be specified by as a string of characters (optionally comma separated)
 
 See the examples below for sample machine and tape specifications.
 
+### Note About Tape and Machine Sizes 
+
+The space required by the simulator grows as `Q*n*3^n` where `n` is the size of the tape and `Q` is the number of states of the machine. In practice, any tapes larger than 4 cells (including blanks), will result in high memory usage*. This is at simulator and must explicitly consider all possible configurations of the machine. A true QTM would handle this much better. A quote from Bernstein and Vazirani's 1993 paper captures this sentiment nicely:
+
+> The implications of this are quite extraordinary: even for a small system consisting of 200 particles, nature must keep track of 2^200 complex numbers just to “remember” its instantaneous state. Moreover, it must update these numbers at each instant to evolve the system in time. This is an extravagant amount of effort, since 2^200 is larger than the standard estimates on the number of particles in the visible universe. So if nature puts in such extravagant amounts of effort to evolve even a tiny system at the level of quantum mechanics, it would make sense that we should design our computers to take advantage of this.
+
+
 ## Examples
 
 ### Overwriter
