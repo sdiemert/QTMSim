@@ -1,6 +1,6 @@
 {
   "name": "qtmjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "quantum turing machine simulator package",
   "main": "driver.js",
   "scripts": {
