@@ -123,7 +123,7 @@ Deutsch's problem is a toy problem for demonstrating how a quantum machine can p
 
 Here is a machine specification containing M1 and M0 where M0 computes `y XOR (f(x) = x)`. 
 
-'''text
+```text
 ; M1: put the input x into superposition
 0,0,1,1,1,0.7071067811865476
 0,0,0,1,1,0.7071067811865476
@@ -158,7 +158,7 @@ Here is a machine specification containing M1 and M0 where M0 computes `y XOR (f
 6,0,0,6,0,1
 6,1,1,6,0,1
 6,2,2,6,0,1
-'''
+```
 
 The following code will execute the machine, this is also in `examples/api-example-3.js`.
 
