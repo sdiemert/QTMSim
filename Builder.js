@@ -27,6 +27,17 @@ function countStates(A){
 }
 
 /**
+ * Builds a QTM from a csv text blob.
+ * @param S {string}
+ * @param tapeSize {number}
+ * @param base {number=3}
+ * @returns {QTM}
+ */
+function machineFromBlob(S, tapeSize, base){
+    return buildMachine(csv(cleanMachineSpecification(S)), tapeSize, base);
+}
+
+/**
  * Makes a QTM from the input 2D array
  * @param M {Array} contains the specification for the QTM
  * @param Nt {number} number of cells in the tape
@@ -106,9 +117,8 @@ function machineFromFile(fname, Nt, base){
 
     }else if(csvRegex.exec(fname)){
         // read file and remove duplicate new line characters.
-        const blob = fs.readFileSync(fname, "utf-8").replace(/;.*\n/g, "").replace(/\n\n/g, "\n");
-        const M =  buildMachine(csv(blob), Nt, base);
 
+        const M = machineFromBlob(fs.readFileSync(fname, "utf-8"), Nt, base);
         //write machine to file for speed later.
         fs.writeFileSync(fname.replace(/\.csv/g, ".matrix"), JSON.stringify(M), 'utf-8');
 
@@ -117,8 +127,19 @@ function machineFromFile(fname, Nt, base){
     }else{
         return null; // nothing found.
     }
+}
 
-
+/**
+ * Cleans the machine specification before CSV parsing, removes comments
+ * and extra white spaces.
+ * @param S {string} the machine specification blob to the cleaned.
+ */
+function cleanMachineSpecification(S){
+    return S.replace(/;.*\n/g, "")
+            .replace(/\n\n/g, "\n")
+            .replace(/#/g, "2")
+            .replace(/L/g, "-1")
+            .replace(/R/g, "1");
 }
 
 /**
@@ -199,22 +220,14 @@ function checkUnitary(U, q, t){
     actually needing an infinite tape....
     */
 
-    var S = "", Su = "";
+    let Su = "";
 
     for(var i = 0; i < X.size()[0]; i++){
-
         for(var j = 0; j < X.size()[0]; j++){
-
-            S += math.subset(X, math.index(i,j)) +" ";
             Su += math.subset(U, math.index(i,j)) +" ";
-
         }
-        S += "\n";
         Su += "\n";
     }
-
-    //console.log(S);
-    //console.log(Su);
 
     fs.writeFileSync('matrix.txt', Su, 'utf-8');
 
@@ -259,5 +272,6 @@ function checkMatrixAmplitudes(U){
 
 module.exports = {
     buildMachine : buildMachine,
-    machineFromFile : machineFromFile
+    machineFromFile : machineFromFile,
+    machineFromBlob : machineFromBlob
 };

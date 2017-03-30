@@ -40,11 +40,18 @@ class Configuration{
      * @param p {number} fixed point precision
      */
     complexToString(z, p){
-        return z.re.toFixed(p) + (z.im !==0 ? ("i" + z.im.toFixed(p)) : "");
+        if(z){
+            return z.re.toFixed(p) + (z.im !==0 ? ("i" + z.im.toFixed(p)) : "");
+        }else{
+            return "";
+        }
     }
 
     toString(){
-        let S = "{ id: "+this.configurationId+", state: " + this.machineState + ", coeff : "+this.complexToString(this.coefficent, 2)+", amp^2: "+this.amplitudeSquared.toFixed(2)+" tape: ";
+        let S = "{ id: "+this.configurationId+", state: " + this.machineState
+            + (this.coefficent !== null ? ", coeff : "+this.complexToString(this.coefficent, 2) : "")
+            + (this.amplitudeSquared !== null ? ", amp^2: "+ this.amplitudeSquared.toFixed(2) : "")
+            +", tape: ";
 
         for(let i = 0; i < this.tape.length; i++){
             if(i === this.headPosition){
@@ -182,6 +189,9 @@ class QTM{
      *  @return {boolean}
      */
     haltingSuperposition(){
+
+        if(this.start === this.halt) return false; //if the start and halting state are the same we have a problem.
+
         const S = this.getSuperposition();
         for(let s = 0; s < S.length; s++){
             if(S[s].machineState !== this.halt) return false;
@@ -218,6 +228,10 @@ class QTM{
 
         for(let i = 0; i < S.length; i++){
             if(r >= s && r < s + S[i].amplitudeSquared){
+
+                S[i].amplitudeSquared = null;
+                S[i].coefficent = null;
+
                 return S[i]; // return the Configuration
             }
             s += S[i].amplitudeSquared;
