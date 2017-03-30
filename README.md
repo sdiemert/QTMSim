@@ -2,7 +2,26 @@
 
 This is a simulator package for a Quantum Turing Machine (QTM). This was completed as a course project for a graduate level course on quantum computing that the University of Victoria.
 
-This simulator takes as input a machine specification and a tape and executes a up to a specified number of steps of the machine.
+This simulator takes as input a machine specification and a tape and executes up to a specified number of steps of the machine.
+
+## Machine Specification
+
+Recall that Turing Machine has a state transition function that maps an internal machine state and read tape symbol to write tape symbol, a next state, and a movement direction. QTMs use a similar formulation, however they also have a complex number that acts as a coefficient of the transition. Thus a tuple in the transition function could be represented as `(q,r,w,q',m,a)`, there is the added restriction that `sum(|a_i|^2) = 1.0` for all `a_i` that have the same `q,r` pairings.
+
+The simulator uses a tape with an alphabet consiiting of three symbols: `{0,1,#}`, here `#` may be replaced by `2`. The simulator allows head movement to the left, right, and no movement: `{L, R, 0}` which may also be given as `{-1, 1, 0}` (if one thinks of the head location as indices in a tape array)
+  
+CSV strings are used to provide machine specifications. Each row in the specification must have form: `state,read,write,next-state,move,coefficient`.
+
+1. `state` - the first state, i.e. state of to transition out of, must be a number.
+2. `read` - the symbol to read from the tape, one of `{0,1,#}`.
+3. `write` - write this symbol to the tape, one of `{0,1,#}`. 
+4. `next-state` - move to this state after writing and moving the tape head, one of must be a number.
+5. `move` - move the head left, right, or do not move it, one of `{L,R,0,1,-1}`.
+6. `coefficient` - the coefficient for the state, specified as a complex number, e.g. `1`, `0.5`, `1+i1` etc.
+
+Tapes may be specified by as a string of characters (optionally comma separated), e.g. `000#` or `0,1,#`. Tapes are finite in length (this is a simulator) and are unidirectional, they extend from the left (index 0) to the right (index n-1).
+
+See the examples below for sample machine and tape specifications.
 
 ## Examples
 
