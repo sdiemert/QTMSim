@@ -1,6 +1,6 @@
 # Quantum Turing Machine Simulator
 
-This is a simulator package for a Quantum Turing Machine (QTM). This was completed as a course project for a graduate level course on quantum computing that the University of Victoria.
+This is a simulator package for a Quantum Turing Machine (QTM). This was completed as a course project for a graduate level course on quantum computing at the University of Victoria.
 
 This simulator takes as input a machine specification and a tape and executes up to a specified number of steps of the machine.
 
