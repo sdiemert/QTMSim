@@ -5,9 +5,10 @@
 
 const qtmjs = require("../qtmjs");
 
-const T = "000#";
 
-const Q = qtmjs.buildQTMFromFile('examples/qtm-parity.csv', 4);
+const T = "01#";
+
+const Q = qtmjs.buildQTMFromFile('examples/qtm-deutsch.csv', 3);
 
 Q.execute(qtmjs.buildTape(T),0,10, function(Q){
     console.log(Q.getSuperposition().toString());

@@ -113,9 +113,88 @@ The code for this example may be found in: `examples/api-example-2.js`. To run t
 
 Deutsch's problem is a toy problem for demonstrating how a quantum machine can provide exponential speed up (when compared with a classical machine). The problem is a simplification of the Deutsch-Jozsa problem. You can read more about it here [https://en.wikipedia.org/wiki/Deutsch%E2%80%93Jozsa_algorithm](https://en.wikipedia.org/wiki/Deutsch%E2%80%93Jozsa_algorithm).
 
-Four QTM specifications are provided in `specs` folder, one for each possible configuration in Deutsch's problem.
+**Problem Statement:** Given an oracle machine, M0, that implements some unary function, `f : {0,1} -> {0,1}`, we would like to determine if it is *constant* or *balanced*. 
 
-Run them by `$ node qtmjs.js -m ./specs/qtm-x.csv -t 01# -i 10`
+**Formulation:** We create two machines: 0) machine M0, which computes `y XOR f(x)` for two inputs provided to it; and 1) machine M1, which determines whethere `f(x)` is constant or balanced by calling M0. 
+
+**Classical Approach:** The classical approach would require `O(2^n)` operations. For this problem M1 would call M0 `2^1` times to determine whether the function is constant or balanced. This is an exponential operation for M1.  
+
+**Quantum Approach:** In the quantum approach, the machine M1 first puts the input tape `xy# = 01#` into a superposition such that there are 4 possible configurations (`xy` is one of `00`, `01`, `10`, `11`). M1 then invokes M0 which computes `y XOR f(x)` and passes control back to M1 which tne reads cell `x`. If `x=0` then `f(x)` is constant, if `x=1` then `f(x)` is balanced.  
+
+Here is a machine specification containing M1 and M0 where M0 computes `y XOR (f(x) = x)`. 
+
+'''text
+; M1: put the input x into superposition
+0,0,1,1,1,0.7071067811865476
+0,0,0,1,1,0.7071067811865476
+0,1,1,1,1,0.7071067811865476
+0,1,0,1,1,-0.7071067811865476
+
+; M1: put the input y into superposition
+1,0,0,2,-1,0.7071067811865476
+1,0,1,2,-1,0.7071067811865476
+1,1,0,2,-1,0.7071067811865476
+1,1,1,2,-1,-0.7071067811865476
+
+; M0: read input x and advance to y.
+2,0,0,3,1,1
+2,1,1,4,1,1
+
+; M0: f(x) = x, compute x is 0, we are reading y for y xor f(x)
+3,0,0,5,-1,1
+3,1,1,5,-1,1
+
+; M0: f(x) = x, compute x is 1, we are reading y for y xor f(x)
+4,0,1,5,-1,1
+4,1,0,5,-1,1
+
+; M1: collapse the super position on x
+5,0,0,6,0,0.7071067811865476
+5,0,1,6,0,0.7071067811865476
+5,1,0,6,0,0.7071067811865476
+5,1,1,6,0,-0.7071067811865476
+
+; halting state
+6,0,0,6,0,1
+6,1,1,6,0,1
+6,2,2,6,0,1
+'''
+
+The following code will execute the machine, this is also in `examples/api-example-3.js`.
+
+```JavaScript
+const qtmjs = require("../qtmjs");
+
+const T = "01#";
+
+const Q = qtmjs.buildQTMFromFile('examples/qtm-deutsch.csv', 3);
+
+Q.execute(qtmjs.buildTape(T),0,10, function(Q){
+    console.log(Q.getSuperposition().toString());
+});
+
+console.log("------------");
+console.log(Q.measure().toString());
+```
+
+Execute this code via: `$ js examples/api-example-3.js`. 
+
+The following output is produced: 
+
+```text
+{ id: 21, state: 0, coeff : 1.00, amp^2: 1.00, tape: [0] 1 # }
+{ id: 237, state: 1, coeff : 0.71, amp^2: 0.50, tape: 0 [1] # },{ id: 238, state: 1, coeff : 0.71, amp^2: 0.50, tape: 1 [1] # }
+{ id: 72, state: 2, coeff : 0.50, amp^2: 0.25, tape: [0] 0 # },{ id: 73, state: 2, coeff : 0.50, amp^2: 0.25, tape: [1] 0 # },{ id: 75, state: 2, coeff : -0.50, amp^2: 0.25, tape: [0] 1 # },{ id: 76, state: 2, coeff : -0.50, amp^2: 0.25, tape: [1] 1 # }
+{ id: 288, state: 3, coeff : 0.50, amp^2: 0.25, tape: 0 [0] # },{ id: 291, state: 3, coeff : -0.50, amp^2: 0.25, tape: 0 [1] # },{ id: 316, state: 4, coeff : 0.50, amp^2: 0.25, tape: 1 [0] # },{ id: 319, state: 4, coeff : -0.50, amp^2: 0.25, tape: 1 [1] # }
+{ id: 153, state: 5, coeff : 0.50, amp^2: 0.25, tape: [0] 0 # },{ id: 154, state: 5, coeff : -0.50, amp^2: 0.25, tape: [1] 0 # },{ id: 156, state: 5, coeff : -0.50, amp^2: 0.25, tape: [0] 1 # },{ id: 157, state: 5, coeff : 0.50, amp^2: 0.25, tape: [1] 1 # }
+{ id: 181, state: 6, coeff : 0.71, amp^2: 0.50, tape: [1] 0 # },{ id: 184, state: 6, coeff : -0.71, amp^2: 0.50, tape: [1] 1 # }
+------------
+{ id: 181, state: 6, tape: [1] 0 # }
+```
+
+The final superposition contains only the value `x=1`, thus M1 has correctly determined that `f(x)` was balanced. Moreover, it did it with 1 call to M0, in constrast to the 2 calls to M0 a classical machine would require.
+
+The Deutsch-Josza problem is a generalization of this problem to functions with n inputs, i.e. `f : {0,1}^n -> {0,1}`. 
 
 ## API
 
