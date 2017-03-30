@@ -53,11 +53,16 @@ class Configuration{
             + (this.amplitudeSquared !== null ? ", amp^2: "+ this.amplitudeSquared.toFixed(2) : "")
             +", tape: ";
 
+        let s = "";
         for(let i = 0; i < this.tape.length; i++){
+
+            if(this.tape[i] === 2) s = "#";
+            else s = this.tape[i];
+
             if(i === this.headPosition){
-                S += "["+this.tape[i]+"] ";
+                S += "["+s+"] ";
             }else{
-                S += this.tape[i]+" ";
+                S += s+" ";
             }
         }
 

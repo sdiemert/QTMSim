@@ -7,7 +7,10 @@ const qtmjs = require("../qtmjs");
 
 // a simple machine specification that overwrites the
 // the tape with 1's until it reaches the first blank.
-const S = "0,0,1,0,R,1\n0,1,1,0,R,1\n0,#,#,0,0,1\n";
+const S = "" +
+    "0,0,1,0,R,1\n" +
+    "0,1,1,0,R,1\n" +
+    "0,#,#,0,0,1\n";
 
 const T = "000#";
 

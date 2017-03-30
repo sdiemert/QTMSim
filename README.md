@@ -17,7 +17,10 @@ const qtmjs = require("../qtmjs");
 
 // a simple machine specification that overwrites the
 // the tape with 1's until it reaches the first blank.
-const S = "0,0,1,0,R,1\n0,1,1,0,R,1\n0,#,#,0,0,1\n";
+const S = "" +
+    "0,0,1,0,R,1\n" +
+    "0,1,1,0,R,1\n" +
+    "0,#,#,0,0,1\n";
 
 // Create tape string, this should be keep fairly short... 
 const T = "000#";
@@ -38,10 +41,10 @@ console.log(Q.measure().toString());
 The output of this script will be: 
 
 ```
-{ id: 310, state: 0, tape: 1 1 1 [2] }
+{ id: 310, state: 0, tape: 1 1 1 [#] } 
 ```
 
-The machine terminated in state `0`  with a tape of `1112` and the head on the last cell. 
+The machine terminated in state `0`  with a tape of `111#` and the head on the last cell. 
 
 The code the this example may be found in `examples/api-example-1.js`. To run the example execute, `$ node examples/api-example.js`
 
