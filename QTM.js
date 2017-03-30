@@ -180,6 +180,7 @@ class QTM{
         this.V = math.zeros(this.U.size()[0], 1);
         let j = this.indexFromState(0, T);
         this.V = math.subset(this.V, math.index(j,0), 1);
+        if(fn) fn(this);
 
         for (let i = 0; i < n && !this.haltingSuperposition(); i++) {
             this.V = math.multiply(this.U, this.V);

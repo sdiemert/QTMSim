@@ -106,8 +106,14 @@ function machineFromMatrixFile(fname){
 
 }
 
-function machineFromFile(fname, Nt, base){
-
+/**
+ * @param fname {string} the name of the file
+ * @param Nt {number} number of cells on the machine's tape
+ * @param base {number} size of machine alphabet
+ * @param writeMatrix {boolean} if we should write the resulting machine's matrix to a file for saving later.
+ * @returns {QTM} the built QTM.
+ */
+function machineFromFile(fname, Nt, base, writeMatrix){
     let matrixRegex = /\.matrix/;
     let csvRegex = /\.csv/;
 
@@ -119,8 +125,9 @@ function machineFromFile(fname, Nt, base){
         // read file and remove duplicate new line characters.
 
         const M = machineFromBlob(fs.readFileSync(fname, "utf-8"), Nt, base);
+
         //write machine to file for speed later.
-        fs.writeFileSync(fname.replace(/\.csv/g, ".matrix"), JSON.stringify(M), 'utf-8');
+        if(writeMatrix) fs.writeFileSync(fname.replace(/\.csv/g, ".matrix"), JSON.stringify(M), 'utf-8');
 
         return M;
 
@@ -138,6 +145,7 @@ function cleanMachineSpecification(S){
     return S.replace(/;.*\n/g, "")
             .replace(/\n\n/g, "\n")
             .replace(/#/g, "2")
+            .toUpperCase()
             .replace(/L/g, "-1")
             .replace(/R/g, "1");
 }
