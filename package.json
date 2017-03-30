@@ -12,7 +12,6 @@
     "command-line-args": "^4.0.2",
     "command-line-usage": "^4.0.0",
     "csv-parse": "^1.2.0",
-    "libui-node": "0.0.12",
     "mathjs": "^3.10.0"
   },
   "directories": {
